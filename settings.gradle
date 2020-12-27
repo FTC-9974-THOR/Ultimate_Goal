@@ -1,0 +1,6 @@
+include ':ThorCore'
+include ':examples'
+include ':easyopencv'
+include ':ThorCore-master'
+include ':FtcRobotController'
+include ':TeamCode'
