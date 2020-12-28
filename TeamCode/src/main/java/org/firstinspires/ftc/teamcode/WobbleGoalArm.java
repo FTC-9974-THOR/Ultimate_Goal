@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.ftc9974.thorcore.meta.Realizer;
 import org.ftc9974.thorcore.meta.annotation.Hardware;
+import org.ftc9974.thorcore.util.MathUtilities;
 
 /*LIST OF THINGS THIS NEEDS TO BE ABLE TO DO
 1. Close hand
@@ -18,6 +19,13 @@ import org.ftc9974.thorcore.meta.annotation.Hardware;
 //Note: Ben says there is a reduction on the arm servo
 public class WobbleGoalArm {
 
+    public static final double FULLY_RETRACTED = MathUtilities.map(650, 500, 2500, 0, 1),
+                                STRAIGHT_UP = MathUtilities.map(800, 500, 2500, 0, 1),
+                                GRABBING_POSITION = MathUtilities.map(2100, 500, 2500, 0, 1),
+                                FULLY_DOWN = MathUtilities.map(2500, 500, 2500, 0,1),
+                                CLAW_OPEN = MathUtilities.map(1000, 500, 2500, 0,1),
+                                CLAW_CLOSED = MathUtilities.map(2200, 500, 2500, 0,1);
+
     @Hardware
     public ServoImplEx arm;
     @Hardware
@@ -27,8 +35,8 @@ public class WobbleGoalArm {
         Realizer.realize(this, hm);
 
         //THESE NEED SET I JUST THREW THEM IN HERE
-        arm.setPwmRange(new PwmControl.PwmRange(1000,2000));
-        hand.setPwmRange(new PwmControl.PwmRange(1000,2000));
+        arm.setPwmRange(new PwmControl.PwmRange(500,2500));
+        hand.setPwmRange(new PwmControl.PwmRange(500,2500));
     }
 
     public void setHandPosition(double handPosition){
@@ -41,27 +49,32 @@ public class WobbleGoalArm {
 
     //closed hand is 1
     public void closeHand(){
-        setHandPosition(1);
+
+        setHandPosition(CLAW_CLOSED);
     }
 
     //open hand is 0
-    public void openHand(){
-        setHandPosition(0);
+    public void openHand() {
+        setHandPosition(CLAW_OPEN);
     }
 
-    //this is the fully back position the arm starts in and allows us to go over the wall with the goal
-    public void goToUpPosition(){
-        setArmPosition(0);
+    public void goToRetractedPosition(){
+        setArmPosition(FULLY_RETRACTED);
+    }
+
+    //straight up
+    public void goToUpPosition() {
+        setArmPosition(STRAIGHT_UP);
     }
 
     //the arm sticks straight out to place the wobble goal
     public void goToPlacingPosition(){
-        setArmPosition(0.5);
+        setArmPosition(GRABBING_POSITION);
     }
 
     //this position is used to tip up a wobble goal
     public void goToDownPosition(){
-        setArmPosition(1);
+        setArmPosition(FULLY_DOWN);
     }
 
 }

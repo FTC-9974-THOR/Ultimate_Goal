@@ -14,14 +14,24 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.ftc9974.thorcore.meta.Realizer;
 import org.ftc9974.thorcore.meta.annotation.Hardware;
 
-class IntakeandRamp {
+public class IntakeAndRamp {
 
     @Hardware
     public DcMotor intake;
     @Hardware
     public DcMotor ramp;
+    @Hardware
+    public DcMotor hopper;
 
-    public IntakeandRamp(HardwareMap hm){
+    public IntakeAndRamp(HardwareMap hm){
         Realizer.realize(this,hm);
+
+        hopper.setDirection(DcMotor.Direction.REVERSE);
+    }
+
+    public void setPower(double power){
+        intake.setPower(power);
+        ramp.setPower(power);
+        hopper.setPower(power);
     }
 }
