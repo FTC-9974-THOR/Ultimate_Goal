@@ -23,7 +23,7 @@ public class Shooter {
                                 PUSHER_MOVEMENT_TIME= 0.5,
                                 RESET_TIME = 1.2;
 
-    private double spinUpSpeed;
+    public double spinUpSpeed;
 
     //we have to add Hardware annotation to these to use the realizer
     @Hardware

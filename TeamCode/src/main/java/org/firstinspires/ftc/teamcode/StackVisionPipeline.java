@@ -1,11 +1,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-        import org.opencv.core.*;
-        import org.opencv.imgproc.Imgproc;
-        import org.openftc.easyopencv.OpenCvPipeline;
+import org.opencv.core.*;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvPipeline;
 
-        import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 // To do 12/13/20: determine a value for cbThreshold; adjust anchor points, region widths, and region heights
 //12/14/20 Added Saturation!
@@ -20,13 +20,14 @@ public class StackVisionPipeline extends OpenCvPipeline {
     static final Scalar GREEN = new Scalar(0, 255, 0);
     static final Scalar BLUE = new Scalar(0,0,255);
 
-    StackHeight height = StackHeight.ZERO;
+    //StackHeight height = StackHeight.ZERO;
+    StackHeight height = null;
 
     /* There are two regions: upperRegion and lowerRegion. They have the same width, but not the same height.
      */
 
-    static final Point UPPER_REGION_ANCHOR_POINT = new Point(375,75);//was 109, 98
-    static final Point LOWER_REGION_ANCHOR_POINT = new Point(375, 135);
+    static final Point UPPER_REGION_ANCHOR_POINT = new Point(375,100);//was 109, 98
+    static final Point LOWER_REGION_ANCHOR_POINT = new Point(375, 155);
 
     static final int REGION_WIDTH = 10;
     static final int UPPER_REGION_HEIGHT = 25;

@@ -4,12 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.camera.names.WebcamNameImpl;
 import org.ftc9974.thorcore.control.math.Vector2;
 import org.ftc9974.thorcore.control.navigation.Fusion2;
 import org.ftc9974.thorcore.control.navigation.IMUNavSource;
 import org.ftc9974.thorcore.control.navigation.MecanumEncoderCalculator;
 import org.ftc9974.thorcore.robot.drivetrains.MecanumDrive;
 import org.ftc9974.thorcore.util.TimingUtilities;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous(name = "RedWobbleandPark2")
 public class RedWobbleandPark2 extends LinearOpMode {
@@ -19,17 +24,27 @@ public class RedWobbleandPark2 extends LinearOpMode {
     private IMUNavSource navSource;
     private Fusion2 f2;
 
+    private OpenCvCamera webcam;
     private Shooter shooter;
     private WobbleGoalArm wga;
 
+    StackVisionPipeline pipeline;
     StackVisionPipeline.StackHeight height;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,"Webcam 1"));
 
-        StackVisionPipeline pipeline = new StackVisionPipeline();
+
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(1280,720,OpenCvCameraRotation.UPRIGHT);
+            }
+        });
+        webcam.setPipeline(new StackVisionPipeline());
+
         height = pipeline.getAnalysis();
-
 
         md = new MecanumDrive(hardwareMap);
         calculator = new MecanumEncoderCalculator(27.4, 96);
@@ -113,24 +128,48 @@ public class RedWobbleandPark2 extends LinearOpMode {
         //turns back so it is straight forward
         f2.turnToHeading(0, this::update);
 
+        shooter.spinDown();
+
         switch (height){
             case FOUR:
                 //drives to the corner zone
-                f2.driveToPoint(new Vector2(0, -1000), this::update);
+                f2.driveToPoint(new Vector2(0, -400), this::update);
                 wga.goToPlacingPosition();
+                TimingUtilities.sleep(this,0.6,this::update, null);
                 wga.openHand();
+                TimingUtilities.sleep(this,0.5, this::update, null);
                 break;
             case ONE:
                 //drives to the middle zone
-                f2.driveToPoint(new Vector2(500, -500), this::update);
+                f2.driveToPoint(new Vector2(150, -250), this::update);
                 wga.goToPlacingPosition();
+                TimingUtilities.sleep(this,0.6,this::update, null);
                 wga.openHand();
+                TimingUtilities.sleep(this,0.5, this::update, null);
                 break;
             case ZERO:
                 //drives to the near zone
                 f2.driveToPoint(new Vector2(0, -400), this::update);
                 wga.goToPlacingPosition();
+                TimingUtilities.sleep(this,0.6,this::update, null);
                 wga.openHand();
+                TimingUtilities.sleep(this,0.5, this::update, null);
+
+                //the speed the robot will start moving at
+                f2.setStartSpeed(0.2);
+                //how long it will take for the robot to reach "cruise speed"
+                f2.setRampUpDistance(50);
+                //the cruise speed (you can also think of this as max speed)
+                f2.setCruiseSpeed(0.3);
+                //how long it will take for the robot to slow down to crawl speed
+                f2.setRampDownDistance(100);
+                //how long the robot will "crawl", or move slowly
+                f2.setCrawlDistance(50);
+                //the speed at which the robot will crawl
+                f2.setCrawlSpeed(0.1);
+
+                f2.driveToPoint(new Vector2(250, 0), this::update);
+                f2.driveToPoint(new Vector2(0, 200), this::update);
                 break;
 
         }

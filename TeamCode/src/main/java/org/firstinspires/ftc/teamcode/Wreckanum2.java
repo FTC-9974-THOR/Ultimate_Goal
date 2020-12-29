@@ -12,10 +12,10 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 @TeleOp(name = "Wreckanum 2", group = "Teleops")
 public class Wreckanum2 extends OpMode {
 
-    DcMotor backLeft, backRight, frontLeft, frontRight;
+    //DcMotor backLeft, backRight, frontLeft, frontRight;
     MecanumDrive md;
 
-    DriveUtility du = new DriveUtility(backLeft, backRight, frontLeft, frontRight);
+    //DriveUtility du = new DriveUtility(backLeft, backRight, frontLeft, frontRight);
 
     IntakeAndRamp intakeAndRamp;
     WobbleGoalArm wobbleGoalArm;
@@ -40,13 +40,13 @@ public class Wreckanum2 extends OpMode {
         wobbleGoalArm = new WobbleGoalArm(hardwareMap);
         shooter = new Shooter(hardwareMap);
 
-        backLeft = hardwareMap.dcMotor.get("backLeft");
+        /*backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
 
         backLeft.setDirection(DcMotor.Direction.REVERSE);
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);*/
 
         /*for auto pathing use only
         backLeft.setMode(RUN_USING_ENCODER);
@@ -131,23 +131,25 @@ public class Wreckanum2 extends OpMode {
             shooter.cancelLaunches();
         }
 
+        telemetry.addData("Shooter speed", shooter.spinUpSpeed);
+
         //see: race condition
         lastAState = gamepad2.a;
 
         //controls the wobble goal arm
-        if (gamepad1.dpad_left){
+        if (gamepad2.dpad_left){
             wobbleGoalArm.goToRetractedPosition();
-        } else if (gamepad1.dpad_up){
+        } else if (gamepad2.dpad_up){
             wobbleGoalArm.goToUpPosition();
-        } else if (gamepad1.dpad_right){
+        } else if (gamepad2.dpad_right){
             wobbleGoalArm.goToPlacingPosition();
-        } else if (gamepad1.dpad_down && gamepad1.left_bumper && gamepad1.right_bumper){
+        } else if (gamepad2.dpad_down && gamepad2.left_bumper && gamepad2.right_bumper){
             wobbleGoalArm.goToDownPosition();
         }
 
-        if (gamepad1.right_bumper){
+        if (gamepad2.right_bumper){
             wobbleGoalArm.openHand();
-        } else if (gamepad1.left_bumper){
+        } else if (gamepad2.left_bumper){
             wobbleGoalArm.closeHand();
         }
 
