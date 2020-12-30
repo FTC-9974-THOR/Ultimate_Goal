@@ -1,16 +1,24 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.util.RobotLog;
+
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
+// where did this come from? and why?
+//import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 // To do 12/13/20: determine a value for cbThreshold; adjust anchor points, region widths, and region heights
 //12/14/20 Added Saturation!
 
 public class StackVisionPipeline extends OpenCvPipeline {
+
+    private static final String TAG = "StackVisionPipeline";
 
     public enum StackHeight{
         ZERO,
@@ -23,15 +31,20 @@ public class StackVisionPipeline extends OpenCvPipeline {
     //StackHeight height = StackHeight.ZERO;
     StackHeight height = null;
 
+    // since I had to change the streaming resolution, I had to scale each point, width, and height
+    // to match. each point goes to the same place in the image; the image is just at a lower
+    // resolution.
+    private static final double X_SCALE_FACTOR = 640.0 / 1280.0;
+    private static final double Y_SCALE_FACTOR = 480.0 / 720.0;
+
     /* There are two regions: upperRegion and lowerRegion. They have the same width, but not the same height.
      */
+    static final Point UPPER_REGION_ANCHOR_POINT = new Point(375 * X_SCALE_FACTOR,100 * Y_SCALE_FACTOR);//was 109, 98
+    static final Point LOWER_REGION_ANCHOR_POINT = new Point(375 * X_SCALE_FACTOR, 155 * Y_SCALE_FACTOR);
 
-    static final Point UPPER_REGION_ANCHOR_POINT = new Point(375,100);//was 109, 98
-    static final Point LOWER_REGION_ANCHOR_POINT = new Point(375, 155);
-
-    static final int REGION_WIDTH = 10;
-    static final int UPPER_REGION_HEIGHT = 25;
-    static final int LOWER_REGION_HEIGHT = 10;
+    static final int REGION_WIDTH = (int) (10 * X_SCALE_FACTOR);
+    static final int UPPER_REGION_HEIGHT = (int) (25 * Y_SCALE_FACTOR);
+    static final int LOWER_REGION_HEIGHT = (int) (10 * Y_SCALE_FACTOR);
 
     Point upperRegion_pointA = new Point(UPPER_REGION_ANCHOR_POINT.x, UPPER_REGION_ANCHOR_POINT.y);
     Point upperRegion_pointB = new Point(UPPER_REGION_ANCHOR_POINT.x + REGION_WIDTH, UPPER_REGION_ANCHOR_POINT.y + UPPER_REGION_HEIGHT);
@@ -46,6 +59,16 @@ public class StackVisionPipeline extends OpenCvPipeline {
     Mat Saturation = new Mat();
 
     double upper_region_H_average, lower_region_H_average, upper_region_S_average,lower_region_S_average;
+
+    // variable to keep track of if a call to processFrame() has completed.
+    // since processFrame() seems to be called from another thread, this variable is atomic to make
+    // it thread safe.
+    private final AtomicBoolean hasCompletedAnalysis;
+
+    public StackVisionPipeline() {
+        // initialize hasCompletedAnalysis
+        hasCompletedAnalysis = new AtomicBoolean(false);
+    }
 
     void inputToH(Mat input)
     {
@@ -86,9 +109,11 @@ public class StackVisionPipeline extends OpenCvPipeline {
         lower_region_S = Saturation.submat(new Rect (lowerRegion_pointA, lowerRegion_pointB));
 
     }
+
     @Override
     public Mat processFrame(Mat input)
     {
+        RobotLog.ii(TAG, "processFrame()");
         inputToH(input);
         inputToS(input);
 
@@ -140,12 +165,25 @@ public class StackVisionPipeline extends OpenCvPipeline {
             height = StackHeight.ZERO;
         }
 
-        telemetry.addData("[Pattern]", height);
+        // these were referencing a static import to some part of the SDK. apparently the variable
+        // they reference (telemetry) is never initialized so it was throwing NullPointerExceptions.
+        /*telemetry.addData("[Pattern]", height);
         telemetry.addData("UpperRegionHAverage: ", upper_region_H_average);
         telemetry.addData("LowerRegionHAverage: ", lower_region_H_average);
         telemetry.addData("UpperRegionSAverage: ", upper_region_S_average);
         telemetry.addData("LowerRegionSAverage: ", lower_region_S_average);
-        telemetry.update();
+        telemetry.update();*/
+
+        // so I printed the same information to the RobotLog.
+        RobotLog.dd(TAG, "Pattern: %s", height.toString());
+        RobotLog.vv(TAG, "UpperRegionHAverage: %.5f", upper_region_H_average);
+        RobotLog.vv(TAG, "LowerRegionHAverage: %.5f", lower_region_H_average);
+        RobotLog.vv(TAG, "UpperRegionSAverage: %.5f", upper_region_S_average);
+        RobotLog.vv(TAG, "LowerRegionSAverage: %.5f", lower_region_S_average);
+
+        // set hasCompletedAnalysis to true to indicate that the pipeline has processed at least one
+        // frame
+        hasCompletedAnalysis.set(true);
 
         /*
          * Render the 'input' buffer to the viewport. But note this is not
@@ -154,6 +192,11 @@ public class StackVisionPipeline extends OpenCvPipeline {
          */
         return input;
     }
+
+    public boolean hasAnalysis() {
+        return hasCompletedAnalysis.get();
+    }
+
     public StackHeight getAnalysis()
     {
         return height;

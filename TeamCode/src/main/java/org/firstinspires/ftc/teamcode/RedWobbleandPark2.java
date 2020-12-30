@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.function.Continuation;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.internal.camera.names.WebcamNameImpl;
 import org.ftc9974.thorcore.control.math.Vector2;
@@ -35,16 +37,29 @@ public class RedWobbleandPark2 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,"Webcam 1"));
 
-
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                webcam.startStreaming(1280,720,OpenCvCameraRotation.UPRIGHT);
+                // for some reason, streaming at 1280x720 causes EasyOpenCV to stop working. It
+                // throws errors indicating it can't find a USB Streaming Endpoint. Since the FTC
+                // SDK only supports streaming in uncompressed YUV420 (according to EasyOpenCV),
+                // I suspect that the camera can't transfer data fast enough to stream HD YUV420.
+                // if that's the case, it would explain why no endpoint was found, as the camera
+                // simply doesn't have one that supports streaming in that configuration.
+                webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+                //webcam.startStreaming(1280,720,OpenCvCameraRotation.UPRIGHT);
             }
         });
-        webcam.setPipeline(new StackVisionPipeline());
+        //webcam.setPipeline(new StackVisionPipeline());
+        // pipeline was never initialized and webcam.setPipeline() was being given a new pipeline
+        // instance. pipeline stayed null and there was no way to access the pipeline that was
+        // actually doing stuff.
+        pipeline = new StackVisionPipeline();
+        webcam.setPipeline(pipeline);
 
-        height = pipeline.getAnalysis();
+        // streaming is handled asynchronously in another thread. at this point, the pipeline may
+        // not have completed processing a frame. if so, pipeline.getAnalysis() will return null.
+        //height = pipeline.getAnalysis();
 
         md = new MecanumDrive(hardwareMap);
         calculator = new MecanumEncoderCalculator(27.4, 96);
@@ -80,10 +95,30 @@ public class RedWobbleandPark2 extends LinearOpMode {
         telemetry.addData("Stackheight", height);
         telemetry.update();
 
-        waitForStart();
+        //waitForStart();
+        // print a bit of telemetry about the pipeline while waiting for start
+        while (!isStopRequested() && !isStarted()) {
+            telemetry.addData("Pipeline Has Analysis", pipeline.hasAnalysis());
+            if (pipeline.hasAnalysis()) {
+                telemetry.addData("Stack Height", pipeline.getAnalysis());
+            }
+            telemetry.update();
+        }
+        if (isStopRequested()) return;
 
         //start the spinup right away while we're driving to the position
         shooter.spinUp();
+
+        // wait for the pipeline to finish processing, if necessary. unless you hit start
+        // immediately after init, the pipeline should have a result by now. if it doesn't, we need
+        // to wait for one.
+        TimingUtilities.blockUntil(this, pipeline::hasAnalysis, this::update, null);
+        if (isStopRequested()) return;
+        // at this point we know that the pipeline must have a result. the only ways for the
+        // blockUntil() to return is for isStopRequested() or pipeline.hasAnalysis() to return true.
+        // if opmode stop was requested, the if statement would return before this line was reached.
+        height = pipeline.getAnalysis();
+
         //drives to the position
         f2.driveToPoint(new Vector2(0,-850), this::update);
 
