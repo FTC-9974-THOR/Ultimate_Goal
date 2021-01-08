@@ -12,6 +12,31 @@ import org.ftc9974.thorcore.meta.Realizer;
 import org.ftc9974.thorcore.meta.annotation.Hardware;
 import org.ftc9974.thorcore.util.MathUtilities;
 
+import java.util.concurrent.TimeUnit;
+
+/*current velocity = acceleration * time + initial velocity
+(current velocity - pastVelocity)/acceleration = time
+acceleration = (currentVelocity-pastVelocity)/(currentTime-pastTime)
+
+set currentVelocity to the setpoint (0.65 power or 3300 rpm)
+solve for t to get how much time has passed when currentVelocity = setPoint
+
+whenToPush = t (we just solved for this) minus time it takes for the pusher to push the ring
+
+So
+(0.65 - pastVelocity)/acceleration = time
+
+WHAT DO WE WANT? time!
+HOW ARE WE GONNA FIND IT? by finding pastVelocity, currentTime,and pastTime!
+HOW DO WE FIND THOSE? I don't really know
+HOW MUCH OF THIS CAN BE DONE WITHIN THE SHOOTER CLASS? I don't really know that either
+
+pastTime = currentTime; //we need this at some point
+pastVelocity = currentVelocity //need this somewhere too
+
+We want to start tracking velocity and time as soon as the shooter begins spinning up
+ */
+
 //written 12/26/2020
 public class Shooter {
 
@@ -25,6 +50,16 @@ public class Shooter {
 
     public double spinUpSpeed;
 
+    public double pastVelocity = 0;
+    public double currentVelocity;
+    public double targetVelocity;
+    public double currentTime;
+    public double pastTime = 0;
+    public double acceleration;
+    public double timeWhenAtSetpoint;
+    public double howLongToPush;//need to put how long the pusher takes to push in here
+    public double timeToPush = timeWhenAtSetpoint - howLongToPush;
+
     //we have to add Hardware annotation to these to use the realizer
     @Hardware
     public ServoImplEx pusher;
@@ -35,6 +70,7 @@ public class Shooter {
     private int queuedLaunches;
     //are we in a launch cycle or not?
     private boolean inLaunchCycle;
+
     private ElapsedTime et;
 
     public Shooter(HardwareMap hm){
@@ -78,6 +114,10 @@ public class Shooter {
         return flywheel.getMotorType().getGearing() * 60 * (flywheel.getVelocity(AngleUnit.RADIANS)/(2 * Math.PI));
     }
 
+    public double getTime(){
+        return et.now(TimeUnit.SECONDS);
+    }
+
     public boolean isUpToSpeed(){
 
         return Math.abs(getFlywheelVelocity()) > SPEED_THRESHOLD;
@@ -100,6 +140,10 @@ public class Shooter {
         return queuedLaunches;
     }
 
+    public void setTargetVelocity(double velocity){
+        targetVelocity = velocity;
+    }
+
     public void update(){
         //checks if there are any queued launches
         if (queuedLaunches > 0){
@@ -107,7 +151,6 @@ public class Shooter {
                 //sets pusher to the "pushing" position, or 1.
                 if(et.seconds() < PUSHER_MOVEMENT_TIME){
                     pusher.setPosition(1);
-                    //remind me to ask Christopher why we need to call this again...
                     spinUp();
                 //sets pusher to the "not pushing" position, or 0.
                 } else if (et.seconds() < 2 * PUSHER_MOVEMENT_TIME){
@@ -125,6 +168,40 @@ public class Shooter {
                 et.reset();
             }
         }
+    }
+
+    public void updateCalculatedShooting(){
+        currentVelocity = this.getFlywheelVelocity();
+        currentTime = this.getTime();
+        
+        acceleration = (currentVelocity - pastVelocity)/(currentTime - pastTime);
+        timeWhenAtSetpoint = (targetVelocity-pastVelocity)/acceleration;
+
+        timeToPush = timeWhenAtSetpoint - howLongToPush;
+
+        if (queuedLaunches > 0){
+            if (inLaunchCycle){
+                if (et.seconds() >= timeToPush && et.seconds() <= 2 * timeToPush){
+                    pusher.setPosition(1);
+                    spinUp();
+                } else if (et.seconds() >= 2 * timeToPush && et.seconds() <= 2 * timeToPush + RESET_TIME){
+                    pusher.setPosition(0);
+                    spinUp();
+                } else if (et.seconds() >= 2 * timeToPush + RESET_TIME){
+                    spinUp();
+                } else{
+                  inLaunchCycle = false;
+                  queuedLaunches--;
+                }
+            } else if (isUpToSpeed()){
+                inLaunchCycle = true;
+                et.reset();
+            }
+        }
+        pastTime = currentTime;
+        pastVelocity = currentVelocity;
+
+        et.reset();
     }
 
 }

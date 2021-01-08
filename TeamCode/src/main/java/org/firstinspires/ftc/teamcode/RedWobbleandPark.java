@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +13,7 @@ import org.ftc9974.thorcore.robot.drivetrains.MecanumDrive;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static org.firstinspires.ftc.teamcode.StackVisionPipeline.StackHeight.FOUR;
 
+@Disabled
 @Autonomous(name = "RedWobbleandPark", group = "autos")
 public class RedWobbleandPark extends LinearOpMode{
 

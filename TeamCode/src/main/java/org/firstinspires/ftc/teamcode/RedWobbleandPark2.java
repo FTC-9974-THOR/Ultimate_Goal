@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.function.Continuation;
@@ -32,6 +33,8 @@ public class RedWobbleandPark2 extends LinearOpMode {
 
     StackVisionPipeline pipeline;
     StackVisionPipeline.StackHeight height;
+
+    ElapsedTime et;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -95,6 +98,8 @@ public class RedWobbleandPark2 extends LinearOpMode {
         telemetry.addData("Stackheight", height);
         telemetry.update();
 
+        wga.closeHand();
+
         //waitForStart();
         // print a bit of telemetry about the pipeline while waiting for start
         while (!isStopRequested() && !isStarted()) {
@@ -105,9 +110,27 @@ public class RedWobbleandPark2 extends LinearOpMode {
             telemetry.update();
         }
         if (isStopRequested()) return;
+        //we are started!
+
+        //ramping up the shooter: method one (test against two)
+        for (double powerIndex = 0; powerIndex <= shooter.spinUpSpeed; powerIndex += 0.01){
+            TimingUtilities.sleep(this, 0.01, this:: update, null);
+            shooter.setPower(powerIndex);
+        }
+
+        shooter.setPower(shooter.spinUpSpeed);
+        if (isStopRequested()) return;
+        /*
+        //ramping up the shooter: method two (test against one)
+        double rampSpeed = 0.5;
+        ElapsedTime rampTimer = new ElapsedTime();
+
+        while (!isStopRequested() && rampTimer.seconds() <= shooter.spinUpSpeed / rampSpeed) {
+            shooter.setPower(rampSpeed * rampTimer.seconds());
+        }*/
 
         //start the spinup right away while we're driving to the position
-        shooter.spinUp();
+        //shooter.spinUp();
 
         // wait for the pipeline to finish processing, if necessary. unless you hit start
         // immediately after init, the pipeline should have a result by now. if it doesn't, we need
@@ -121,7 +144,6 @@ public class RedWobbleandPark2 extends LinearOpMode {
 
         //drives to the position
         f2.driveToPoint(new Vector2(0,-850), this::update);
-
 
         if(isStopRequested()){
             return;
@@ -168,28 +190,61 @@ public class RedWobbleandPark2 extends LinearOpMode {
         switch (height){
             case FOUR:
                 //drives to the corner zone
-                f2.driveToPoint(new Vector2(0, -400), this::update);
+                f2.driveToPoint(new Vector2(0, -1600), this::update);
+                if(isStopRequested()){
+                    return;
+                }
                 wga.goToPlacingPosition();
                 TimingUtilities.sleep(this,0.6,this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
                 wga.openHand();
                 TimingUtilities.sleep(this,0.5, this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
+                //back up to the line
+                f2.driveToPoint(new Vector2(0, 700), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+                wga.goToUpPosition();
+                TimingUtilities.sleep(this,0.6,this::update,null);
                 break;
             case ONE:
                 //drives to the middle zone
-                f2.driveToPoint(new Vector2(150, -250), this::update);
+                f2.driveToPoint(new Vector2(0, -750), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+                f2.setCrawlSpeed(0.15);
+
+                f2.driveToPoint(new Vector2(600, -150), this::update);
+                if(isStopRequested()){
+                    return;
+                }
                 wga.goToPlacingPosition();
+                if(isStopRequested()){
+                    return;
+                }
                 TimingUtilities.sleep(this,0.6,this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
                 wga.openHand();
+                if(isStopRequested()){
+                    return;
+                }
                 TimingUtilities.sleep(this,0.5, this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
+                wga.goToUpPosition();
+                TimingUtilities.sleep(this,0.6,this::update,null);
                 break;
             case ZERO:
                 //drives to the near zone
-                f2.driveToPoint(new Vector2(0, -400), this::update);
-                wga.goToPlacingPosition();
-                TimingUtilities.sleep(this,0.6,this::update, null);
-                wga.openHand();
-                TimingUtilities.sleep(this,0.5, this::update, null);
-
                 //the speed the robot will start moving at
                 f2.setStartSpeed(0.2);
                 //how long it will take for the robot to reach "cruise speed"
@@ -201,10 +256,40 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 //how long the robot will "crawl", or move slowly
                 f2.setCrawlDistance(50);
                 //the speed at which the robot will crawl
-                f2.setCrawlSpeed(0.1);
+                f2.setCrawlSpeed(0.2);
 
-                f2.driveToPoint(new Vector2(250, 0), this::update);
-                f2.driveToPoint(new Vector2(0, 200), this::update);
+                f2.driveToPoint(new Vector2(0, -400), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+                wga.goToPlacingPosition();
+                if(isStopRequested()){
+                    return;
+                }
+                TimingUtilities.sleep(this,0.6,this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
+                wga.openHand();
+                if(isStopRequested()){
+                    return;
+                }
+                TimingUtilities.sleep(this,0.5, this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
+
+                f2.driveToPoint(new Vector2(300, 0), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+
+                f2.driveToPoint(new Vector2(0, -400), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+                wga.goToUpPosition();
+                TimingUtilities.sleep(this,0.6,this::update,null);
                 break;
 
         }
@@ -237,7 +322,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
 
     }
     private void update(){
-        shooter.update();
+        shooter.updateCalculatedShooting();
         telemetry.addData("Flywheel speed", shooter.getFlywheelVelocity());
         telemetry.addData("Stack Height", height);
         telemetry.update();

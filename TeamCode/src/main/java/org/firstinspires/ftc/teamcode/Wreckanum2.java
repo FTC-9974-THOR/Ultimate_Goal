@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.ftc9974.thorcore.control.TrapezoidalMotionProfile;
 import org.ftc9974.thorcore.robot.drivetrains.MecanumDrive;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
@@ -21,6 +24,8 @@ public class Wreckanum2 extends OpMode {
     WobbleGoalArm wobbleGoalArm;
     Shooter shooter;
 
+    //ElapsedTime et;
+
     private boolean lastAState;
     TrapezoidalMotionProfile motionProfile;
 
@@ -29,6 +34,8 @@ public class Wreckanum2 extends OpMode {
         md = new MecanumDrive(hardwareMap);
 
         md.setAxisInversion(false,true, false);
+
+        //et = new ElapsedTime();
 
         motionProfile = new TrapezoidalMotionProfile(
                 new TrapezoidalMotionProfile.Node(0,0),
@@ -53,6 +60,8 @@ public class Wreckanum2 extends OpMode {
         backRight.setMode(RUN_USING_ENCODER);
         frontLeft.setMode(RUN_USING_ENCODER);
         frontRight.setMode(RUN_USING_ENCODER);*/
+
+        wobbleGoalArm.goToRetractedPosition();
     }
 
     @Override
@@ -121,6 +130,7 @@ public class Wreckanum2 extends OpMode {
                 shooter.launchRing();
             }
         } else if (gamepad2.x){
+            //et.reset();
             shooter.setSpinUpSpeed(0.65);
             shooter.spinUp();
         } else if (gamepad2.back){
@@ -130,6 +140,15 @@ public class Wreckanum2 extends OpMode {
             shooter.spinDown();
             shooter.cancelLaunches();
         }
+
+        /*if (et.seconds() > 7 && shooter.getQueuedLaunches() == 0){
+            shooter.spinDown();
+        }*/
+
+        /*2 conditions:
+        1. Must not currently be in a launch cycle (have any queued launches)
+        2. Seven seconds must have passed
+         */
 
         telemetry.addData("Shooter speed", shooter.spinUpSpeed);
 

@@ -34,7 +34,6 @@ public class WobbleGoalArm {
     public WobbleGoalArm(HardwareMap hm){
         Realizer.realize(this, hm);
 
-        //THESE NEED SET I JUST THREW THEM IN HERE
         arm.setPwmRange(new PwmControl.PwmRange(500,2500));
         hand.setPwmRange(new PwmControl.PwmRange(500,2500));
     }
