@@ -61,7 +61,7 @@ public class Shooter {
     public double howLongToPush;//need to put how long the pusher takes to push in here
     public double timeToPush = timeWhenAtSetpoint - howLongToPush;
 
-    public double kP,kI,kD,kF;
+    //public double kP,kI,kD,kF;
 
     //we have to add Hardware annotation to these to use the realizer
     @Hardware
@@ -80,7 +80,7 @@ public class Shooter {
         Realizer.realize(this, hm);
 
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(kP,kI,kD,kF));
+        //flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(kP,kI,kD,kF));
 
         //we want float, not brake, because there's no reason for it to have to stop very fast
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
