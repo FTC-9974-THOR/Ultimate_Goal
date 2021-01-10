@@ -68,25 +68,25 @@ public class RedWobbleandPark2 extends LinearOpMode {
         calculator = new MecanumEncoderCalculator(27.4, 96);
         navSource = new IMUNavSource(hardwareMap);
 
-        md.setAxisInversion(true, true, false);
+        md.setAxisInversion(false, false, false);
         md.setEncoderInversion(true, true, false, false);
 
-        f2 = new Fusion2(this, md, calculator,navSource,new PIDFCoefficients(-0.8, 0, 0, 0));
+        f2 = new Fusion2(this, md, calculator,navSource,new PIDFCoefficients(0.8, 0, 0, 0));
 
         shooter = new Shooter(hardwareMap);
         wga = new WobbleGoalArm(hardwareMap);
 
         //the speed to which the shooter will spin up
-        shooter.setSpinUpSpeed(0.65);
+        shooter.setSpinUpSpeed(-0.65);
 
         //the speed the robot will start moving at
         f2.setStartSpeed(0.2);
         //how long it will take for the robot to reach "cruise speed"
-        f2.setRampUpDistance(275);
+        f2.setRampUpDistance(300);
         //the cruise speed (you can also think of this as max speed)
-        f2.setCruiseSpeed(0.7);
+        f2.setCruiseSpeed(0.9);
         //how long it will take for the robot to slow down to crawl speed
-        f2.setRampDownDistance(275);
+        f2.setRampDownDistance(300);
         //how long the robot will "crawl", or move slowly
         f2.setCrawlDistance(30);
         //the speed at which the robot will crawl
@@ -113,10 +113,10 @@ public class RedWobbleandPark2 extends LinearOpMode {
         //we are started!
 
         //ramping up the shooter: method one (test against two)
-        for (double powerIndex = 0; powerIndex <= shooter.spinUpSpeed; powerIndex += 0.01){
+        /*for (double powerIndex = 0; powerIndex <= shooter.spinUpSpeed; powerIndex += 0.01){
             TimingUtilities.sleep(this, 0.01, this:: update, null);
             shooter.setPower(powerIndex);
-        }
+        }*/
 
         shooter.setPower(shooter.spinUpSpeed);
         if (isStopRequested()) return;
@@ -143,7 +143,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
         height = pipeline.getAnalysis();
 
         //drives to the position
-        f2.driveToPoint(new Vector2(0,-850), this::update);
+        f2.driveToPoint(new Vector2(0,-750), this::update);
 
         if(isStopRequested()){
             return;
@@ -156,19 +156,25 @@ public class RedWobbleandPark2 extends LinearOpMode {
             return;
         }
 
+        f2.turnToHeading(Math.toRadians(0), this::update);
+
+        if(isStopRequested()){
+            return;
+        }
+
         //waiting for the shooter to stabilize while still running this class's update method
-        TimingUtilities.sleep(this, 4, this::update, null);
+        TimingUtilities.sleep(this, 3, this::update, null);
 
         if(isStopRequested()){
             return;
         }
 
         //turn the robot a little bit away from the goal (-3 degrees)
-        f2.turnToHeading(Math.toRadians(-3), this::update);
+        /*f2.turnToHeading(Math.toRadians(-3), this::update);
 
         if(isStopRequested()){
             return;
-        }
+        }*/
 
         //tells the robot to launch the rings!
         shooter.launchRing();
@@ -204,14 +210,53 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 if(isStopRequested()){
                     return;
                 }
-                //back up to the line
-                f2.driveToPoint(new Vector2(0, 700), this::update);
+                //drives to get second wobble goal
+                f2.driveToPoint(new Vector2(0, 2180), this::update);
                 if(isStopRequested()){
                     return;
                 }
+
+                //turns to get the wobble goal
+                f2.turnToHeading(Math.toRadians(90), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+
+                f2.setCruiseSpeed(0.7);
+                f2.setStartSpeed(0.6);
+
+                if(isStopRequested()){
+                    return;
+                }
+
+                //drives to get the wobble goal
+                f2.driveToPoint(new Vector2(0,-400), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+
+                wga.closeHand();
+                if(isStopRequested()){
+                    return;
+                }
+
+                TimingUtilities.sleep(this,0.7, this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
+
                 wga.goToUpPosition();
-                TimingUtilities.sleep(this,0.6,this::update,null);
+                if(isStopRequested()){
+                    return;
+                }
+
+                TimingUtilities.sleep(this,0.5,this::update,null);
+                if(isStopRequested()){
+                    return;
+                }
+
                 break;
+
             case ONE:
                 //drives to the middle zone
                 f2.driveToPoint(new Vector2(0, -750), this::update);
@@ -243,25 +288,14 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 wga.goToUpPosition();
                 TimingUtilities.sleep(this,0.6,this::update,null);
                 break;
-            case ZERO:
-                //drives to the near zone
-                //the speed the robot will start moving at
-                f2.setStartSpeed(0.2);
-                //how long it will take for the robot to reach "cruise speed"
-                f2.setRampUpDistance(50);
-                //the cruise speed (you can also think of this as max speed)
-                f2.setCruiseSpeed(0.3);
-                //how long it will take for the robot to slow down to crawl speed
-                f2.setRampDownDistance(100);
-                //how long the robot will "crawl", or move slowly
-                f2.setCrawlDistance(50);
-                //the speed at which the robot will crawl
-                f2.setCrawlSpeed(0.2);
 
+            case ZERO:
+                //drives to place the first goal
                 f2.driveToPoint(new Vector2(0, -400), this::update);
                 if(isStopRequested()){
                     return;
                 }
+                //arm down
                 wga.goToPlacingPosition();
                 if(isStopRequested()){
                     return;
@@ -270,6 +304,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 if(isStopRequested()){
                     return;
                 }
+                //releases hand to place first goal
                 wga.openHand();
                 if(isStopRequested()){
                     return;
@@ -279,7 +314,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
                     return;
                 }
 
-                f2.driveToPoint(new Vector2(300, 0), this::update);
+                /*f2.driveToPoint(new Vector2(300, 0), this::update);
                 if(isStopRequested()){
                     return;
                 }
@@ -287,42 +322,165 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 f2.driveToPoint(new Vector2(0, -400), this::update);
                 if(isStopRequested()){
                     return;
-                }
+                }*/
+                //lifts the arm
                 wga.goToUpPosition();
                 TimingUtilities.sleep(this,0.6,this::update,null);
+
+                f2.driveToPoint(new Vector2(0,980), this::update);
+                if (isStopRequested()){
+                    return;
+                }
+                //lowers arm
+                wga.goToPlacingPosition();
+                if(isStopRequested()){
+                    return;
+                }
+                //turns to get the wobble goal
+                f2.turnToHeading(Math.toRadians(90), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+
+                /*TimingUtilities.sleep(this,0.6,this::update, null);
+                if(isStopRequested()){
+                    return;
+                }*/
+
+                //driving up to the wobble goal
+                f2.setCruiseSpeed(0.7);
+                f2.setStartSpeed(0.6);
+
+                if(isStopRequested()){
+                    return;
+                }
+
+                //drives to get the wobble goal
+                f2.driveToPoint(new Vector2(0,-400), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+
+                //closes hand on second wobble goal
+                wga.closeHand();
+                if(isStopRequested()){
+                    return;
+                }
+
+                TimingUtilities.sleep(this,0.7, this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
+                //raises arm with wobble goal in hand
+                wga.goToUpPosition();
+                if(isStopRequested()){
+                    return;
+                }
+
+                TimingUtilities.sleep(this,0.5,this::update,null);
+                if(isStopRequested()){
+                    return;
+                }
+
+                f2.setStartSpeed(0.9);
+                f2.setCruiseSpeed(0.9);
+                f2.setCrawlSpeed(0.9);
+
+                f2.driveToPoint(new Vector2(-2050,-100), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+
+                /*TimingUtilities.sleep(this,0.6,this::update, null);
+                if(isStopRequested()){
+                    return;
+                }*/
+
+                f2.turnToHeading(Math.toRadians(-90), this::update);
+                if(isStopRequested()){
+                    return;
+                }
+
+                wga.goToPlacingPosition();
+                if(isStopRequested()){
+                    return;
+                }
+
+                TimingUtilities.sleep(this,0.7, this::update, null);
+                if(isStopRequested()){
+                    return;
+                }
+
+                wga.openHand();
+                if(isStopRequested()){
+                    return;
+                }
+
+                f2.driveToPoint(new Vector2(-300,300));
+                if(isStopRequested()){
+                    return;
+                }
+
+                wga.goToUpPosition();
+                if(isStopRequested()){
+                    return;
+                }
+
+                TimingUtilities.sleep(this,0.7,this::update,null);
+                if(isStopRequested()){
+                    return;
+                }
+
                 break;
 
         }
 
-        /*
-        TimingUtilities.sleep(this, 1,null, null);
+    }
+
+    private void getTheGoal(){
+        //turns to get the wobble goal
+        f2.turnToHeading(Math.toRadians(90), this::update);
+        if(isStopRequested()){
+            return;
+        }
+
+        //driving up to the wobble goal
+        f2.setCruiseSpeed(0.7);
+        f2.setStartSpeed(0.6);
 
         if(isStopRequested()){
             return;
         }
 
-        f2.driveToPoint(new Vector2(1000, -1000));
-
+        //drives to get the wobble goal
+        f2.driveToPoint(new Vector2(0,-400), this::update);
         if(isStopRequested()){
             return;
         }
 
-        TimingUtilities.sleep(this,1, null, null);
-
+        //closes hand on second wobble goal
+        wga.closeHand();
         if(isStopRequested()){
             return;
         }
 
-        f2.driveToPoint(new Vector2(-1000, 0));
-
+        TimingUtilities.sleep(this,0.7, this::update, null);
         if(isStopRequested()){
             return;
         }
-         */
+        //raises arm with wobble goal in hand
+        wga.goToUpPosition();
+        if(isStopRequested()){
+            return;
+        }
 
+        TimingUtilities.sleep(this,0.5,this::update,null);
+        if(isStopRequested()){
+            return;
+        }
     }
     private void update(){
-        shooter.updateCalculatedShooting();
+        shooter.update();
         telemetry.addData("Flywheel speed", shooter.getFlywheelVelocity());
         telemetry.addData("Stack Height", height);
         telemetry.update();

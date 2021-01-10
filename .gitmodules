@@ -1,0 +1,4 @@
+[submodule "ThorCore"]
+	path = ThorCore
+	url = https://github.com/FTC-9974-THOR/ThorCore.git
+	branch = dev

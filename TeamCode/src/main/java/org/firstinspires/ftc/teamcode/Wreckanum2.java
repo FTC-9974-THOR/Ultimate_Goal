@@ -33,7 +33,7 @@ public class Wreckanum2 extends OpMode {
     public void init() {
         md = new MecanumDrive(hardwareMap);
 
-        md.setAxisInversion(false,true, false);
+        md.setAxisInversion(true,false, true);
 
         //et = new ElapsedTime();
 

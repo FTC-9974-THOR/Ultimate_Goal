@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -46,7 +47,7 @@ public class Shooter {
      */
     private static final double SPEED_THRESHOLD = 3200,
                                 PUSHER_MOVEMENT_TIME= 0.5,
-                                RESET_TIME = 1.2;
+                                RESET_TIME = 1.5;
 
     public double spinUpSpeed;
 
@@ -59,6 +60,8 @@ public class Shooter {
     public double timeWhenAtSetpoint;
     public double howLongToPush;//need to put how long the pusher takes to push in here
     public double timeToPush = timeWhenAtSetpoint - howLongToPush;
+
+    public double kP,kI,kD,kF;
 
     //we have to add Hardware annotation to these to use the realizer
     @Hardware
@@ -77,6 +80,7 @@ public class Shooter {
         Realizer.realize(this, hm);
 
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(kP,kI,kD,kF));
 
         //we want float, not brake, because there's no reason for it to have to stop very fast
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -157,7 +161,7 @@ public class Shooter {
                     pusher.setPosition(0);
                     spinUp();
                 //if this is true then the next ring has dropped and we are ready to start spinning up again
-                } else if (et.seconds() < 2 * PUSHER_MOVEMENT_TIME + RESET_TIME){
+                } else if (et.seconds() < 2 * PUSHER_MOVEMENT_TIME + RESET_TIME && queuedLaunches > 1){
                     spinUp();
                 } else{
                     inLaunchCycle = false;
