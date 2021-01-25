@@ -1,22 +1,25 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.ftc9974.thorcore.control.TrapezoidalMotionProfile;
 import org.ftc9974.thorcore.control.navigation.Fusion2;
 import org.ftc9974.thorcore.control.navigation.IMUNavSource;
+import org.ftc9974.thorcore.control.navigation.MecanumEncoderCalculator;
 import org.ftc9974.thorcore.robot.drivetrains.MecanumDrive;
 
 import java.util.concurrent.TimeUnit;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
-//magic angle: 35.3 degrees (used to be 33.7 degrees)
-@TeleOp(name = "Wreckanum 2", group = "Teleops")
-public class Wreckanum2 extends OpMode {
+@Disabled
+@TeleOp(name = "Wreckanum 3", group = "Teleops")
+public class Wreckanum3 extends OpMode {
 
     //DcMotor backLeft, backRight, frontLeft, frontRight;
     MecanumDrive md;
@@ -26,8 +29,6 @@ public class Wreckanum2 extends OpMode {
     IntakeAndRamp intakeAndRamp;
     WobbleGoalArm wobbleGoalArm;
     Shooter shooter;
-    /*IMUNavSource imu;
-    Fusion2 f2;*/
 
     //ElapsedTime et;
 
@@ -39,9 +40,6 @@ public class Wreckanum2 extends OpMode {
         md = new MecanumDrive(hardwareMap);
 
         md.setAxisInversion(true,false, true);
-
-        /*imu = new IMUNavSource(hardwareMap);
-        f2 = new Fusion2();*/
 
         //et = new ElapsedTime();
 
@@ -139,8 +137,7 @@ public class Wreckanum2 extends OpMode {
             }
         } else if (gamepad2.x){
             //et.reset();
-            shooter.setSpinUpSpeed(0.65);//this was 0.65
-            //shooter.flywheel.setVelocity(2006);
+            shooter.setSpinUpSpeed(0.65);
             shooter.spinUp();
         } else if (gamepad2.back){
             shooter.setSpinUpSpeed(0.68);
@@ -148,9 +145,6 @@ public class Wreckanum2 extends OpMode {
         } else if (gamepad2.y){
             shooter.spinDown();
             shooter.cancelLaunches();
-        } else if (gamepad2.b){
-            shooter.setSpinUpSpeed(0.6);
-            shooter.spinUp();
         }
 
         /*if (et.seconds() > 7 && shooter.getQueuedLaunches() == 0){
@@ -193,3 +187,4 @@ public class Wreckanum2 extends OpMode {
 
     }
 }
+

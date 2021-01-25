@@ -39,8 +39,8 @@ public class StackVisionPipeline extends OpenCvPipeline {
 
     /* There are two regions: upperRegion and lowerRegion. They have the same width, but not the same height.
      */
-    static final Point UPPER_REGION_ANCHOR_POINT = new Point(500 * X_SCALE_FACTOR,85 * Y_SCALE_FACTOR);//was 109, 98
-    static final Point LOWER_REGION_ANCHOR_POINT = new Point(500 * X_SCALE_FACTOR, 140 * Y_SCALE_FACTOR);
+    static final Point UPPER_REGION_ANCHOR_POINT = new Point(500 * X_SCALE_FACTOR,105 * Y_SCALE_FACTOR);//was 109, 98
+    static final Point LOWER_REGION_ANCHOR_POINT = new Point(500 * X_SCALE_FACTOR, 160 * Y_SCALE_FACTOR);
 
     static final int REGION_WIDTH = (int) (10 * X_SCALE_FACTOR);
     static final int UPPER_REGION_HEIGHT = (int) (25 * Y_SCALE_FACTOR);

@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -39,15 +39,17 @@ We want to start tracking velocity and time as soon as the shooter begins spinni
  */
 
 //written 12/26/2020
+
+//original PIDF coefficients: 10,3,0,0
 public class Shooter {
 
     /*SPEED_THRESHOLD is how fast we want the shooter to be spinning when we shoot the rings
       PUSHER_MOVEMENT_TIME is the amount of time it takes for the pusher to push the ring into the flywheel
       RESET_TIME is how long it takes for the next ring to drop. If you want to change the time between shots, change this.
      */
-    private static final double SPEED_THRESHOLD = 3200,
-                                PUSHER_MOVEMENT_TIME= 0.5,
-                                RESET_TIME = 1.5;
+    private static final double SPEED_THRESHOLD = 1000,//was 3200
+            PUSHER_MOVEMENT_TIME= 0.5,
+            RESET_TIME = 1.5;
 
     public double spinUpSpeed;
 
@@ -61,7 +63,7 @@ public class Shooter {
     public double howLongToPush;//need to put how long the pusher takes to push in here
     public double timeToPush = timeWhenAtSetpoint - howLongToPush;
 
-    public double kP,kI,kD,kF;
+    //public double kP, kI, kD,kF;
 
     //we have to add Hardware annotation to these to use the realizer
     @Hardware
@@ -80,10 +82,11 @@ public class Shooter {
         Realizer.realize(this, hm);
 
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(kP,kI,kD,kF));
+        //flywheel.setPIDFCoefficients(kP,kI,kD,kF);
 
         //we want float, not brake, because there's no reason for it to have to stop very fast
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //sets the range of the pusher (the thing that pushes the rings into the flywheel)
         pusher.setPwmRange(new PwmControl.PwmRange(1065,1300));
@@ -156,12 +159,12 @@ public class Shooter {
                 if(et.seconds() < PUSHER_MOVEMENT_TIME){
                     pusher.setPosition(1);
                     spinUp();
-                //sets pusher to the "not pushing" position, or 0.
+                    //sets pusher to the "not pushing" position, or 0.
                 } else if (et.seconds() < 2 * PUSHER_MOVEMENT_TIME){
                     pusher.setPosition(0);
                     spinUp();
-                //if this is true then the next ring has dropped and we are ready to start spinning up again
-                } else if (et.seconds() < 2 * PUSHER_MOVEMENT_TIME + RESET_TIME && queuedLaunches > 1){
+                    //if this is true then the next ring has dropped and we are ready to start spinning up again
+                } else if (et.seconds() < 2 * PUSHER_MOVEMENT_TIME + RESET_TIME){
                     spinUp();
                 } else{
                     inLaunchCycle = false;
@@ -177,7 +180,7 @@ public class Shooter {
     public void updateCalculatedShooting(){
         currentVelocity = this.getFlywheelVelocity();
         currentTime = this.getTime();
-        
+
         acceleration = (currentVelocity - pastVelocity)/(currentTime - pastTime);
         timeWhenAtSetpoint = (targetVelocity-pastVelocity)/acceleration;
 
@@ -194,8 +197,8 @@ public class Shooter {
                 } else if (et.seconds() >= 2 * timeToPush + RESET_TIME){
                     spinUp();
                 } else{
-                  inLaunchCycle = false;
-                  queuedLaunches--;
+                    inLaunchCycle = false;
+                    queuedLaunches--;
                 }
             } else if (isUpToSpeed()){
                 inLaunchCycle = true;
