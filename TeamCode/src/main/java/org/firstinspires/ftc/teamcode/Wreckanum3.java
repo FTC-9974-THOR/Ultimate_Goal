@@ -168,8 +168,6 @@ public class Wreckanum3 extends OpMode {
             wobbleGoalArm.goToUpPosition();
         } else if (gamepad2.dpad_right){
             wobbleGoalArm.goToPlacingPosition();
-        } else if (gamepad2.dpad_down && gamepad2.left_bumper && gamepad2.right_bumper){
-            wobbleGoalArm.goToDownPosition();
         }
 
         if (gamepad2.right_bumper){

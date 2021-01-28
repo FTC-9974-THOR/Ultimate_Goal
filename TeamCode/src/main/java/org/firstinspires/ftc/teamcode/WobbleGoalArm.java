@@ -19,13 +19,13 @@ import org.ftc9974.thorcore.util.MathUtilities;
 //Note: Ben says there is a reduction on the arm servo
 public class WobbleGoalArm {
 
-    public static final double FULLY_RETRACTED = MathUtilities.map(650, 500, 2500, 0, 1),
-                                STRAIGHT_UP = MathUtilities.map(1450, 500, 2500, 0, 1),//was 800
+    public static final double FULLY_RETRACTED = MathUtilities.map(500, 500, 2500, 0, 1),//was 650
+                                STRAIGHT_UP = MathUtilities.map(900, 500, 2500, 0, 1),//was 800
                                 RESET_ARM_AUTO = MathUtilities.map(800, 500, 2500, 0,1),
                                 GRABBING_POSITION = MathUtilities.map(2100, 500, 2500, 0, 1),
-                                FULLY_DOWN = MathUtilities.map(2500, 500, 2500, 0,1),
-                                CLAW_OPEN = MathUtilities.map(1000, 500, 2500, 0,1),
-                                CLAW_CLOSED = MathUtilities.map(2200, 500, 2500, 0,1);
+                                //FULLY_DOWN = MathUtilities.map(2500, 500, 2500, 0,1),
+                                CLAW_OPEN = MathUtilities.map(1270, 500, 2500, 0,1),//was 500
+                                CLAW_CLOSED = MathUtilities.map(2100, 500, 2500, 0,1);
 
     @Hardware
     public ServoImplEx arm;
@@ -73,8 +73,8 @@ public class WobbleGoalArm {
     }
 
     //this position is used to tip up a wobble goal
-    public void goToDownPosition(){
+    /*public void goToDownPosition(){
         setArmPosition(FULLY_DOWN);
-    }
+    }*/
 
 }
