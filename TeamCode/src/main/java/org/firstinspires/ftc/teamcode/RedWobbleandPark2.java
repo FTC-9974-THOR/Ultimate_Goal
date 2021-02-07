@@ -107,6 +107,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
         telemetry.addData("Stackheight", height);
         telemetry.update();
 
+        wga.goToRetractedPosition();
         wga.closeHand();
 
         //waitForStart();
@@ -212,7 +213,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 }
                 //4.2 lowers the arm to place the first wobble goal
                 wga.goToPlacingPosition();
-                TimingUtilities.sleep(this,0.6,this::update, null);
+                TimingUtilities.sleep(this,0.7,this::update, null);
                 if(isStopRequested()){
                     return;
                 }
@@ -291,7 +292,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
                     return;
                 }
 
-                TimingUtilities.sleep(this,0.6,this::update,null);
+                TimingUtilities.sleep(this,0.7,this::update,null);
                 if(isStopRequested()){
                     return;
                 }
@@ -335,7 +336,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
                     return;
                 }
 
-                TimingUtilities.sleep(this,0.7,this::update, null);
+                TimingUtilities.sleep(this,0.8,this::update, null);
                 if(isStopRequested()){
                     return;
                 }
@@ -361,7 +362,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
                     return;
                 }
                 //1.6 turns off ramp and intake
-                intakeAndRamp.setPower(0);
+
                 //1.7 turns to grab the second wobble goal
                 f2.turnToHeading(Math.toRadians(180));
                 if(isStopRequested()){
@@ -372,6 +373,8 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 if(isStopRequested()){
                     return;
                 }
+
+                intakeAndRamp.setPower(0);
                 //1.9 closes the hand
                 wga.closeHand();
                 if(isStopRequested()){

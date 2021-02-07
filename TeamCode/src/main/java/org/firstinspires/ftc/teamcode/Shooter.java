@@ -48,7 +48,7 @@ public class Shooter {
       RESET_TIME is how long it takes for the next ring to drop. If you want to change the time between shots, change this.
      */
     private static final double SPEED_THRESHOLD = 1000,//was 3200
-            PUSHER_MOVEMENT_TIME= 0.5,
+            PUSHER_MOVEMENT_TIME= 0.35,//this was 0.5
             RESET_TIME = 1.5;
 
     public double spinUpSpeed;
@@ -89,7 +89,7 @@ public class Shooter {
         flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //sets the range of the pusher (the thing that pushes the rings into the flywheel)
-        pusher.setPwmRange(new PwmControl.PwmRange(1065,1300));
+        pusher.setPwmRange(new PwmControl.PwmRange(1065,1250));//this was 1065, 1300
 
         queuedLaunches = 0;
         inLaunchCycle = false;
