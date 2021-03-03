@@ -89,7 +89,7 @@ public class Shooter {
         flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //sets the range of the pusher (the thing that pushes the rings into the flywheel)
-        pusher.setPwmRange(new PwmControl.PwmRange(1065,1250));//this was 1065, 1300
+        pusher.setPwmRange(new PwmControl.PwmRange(1130,1225));//was 1065, 1250 second number is pushing out
 
         queuedLaunches = 0;
         inLaunchCycle = false;

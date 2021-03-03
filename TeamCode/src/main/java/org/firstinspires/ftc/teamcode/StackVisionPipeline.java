@@ -39,8 +39,8 @@ public class StackVisionPipeline extends OpenCvPipeline {
 
     /* There are two regions: upperRegion and lowerRegion. They have the same width, but not the same height.
      */
-    static final Point UPPER_REGION_ANCHOR_POINT = new Point(500 * X_SCALE_FACTOR,105 * Y_SCALE_FACTOR);//was 109, 98
-    static final Point LOWER_REGION_ANCHOR_POINT = new Point(500 * X_SCALE_FACTOR, 160 * Y_SCALE_FACTOR);
+    static final Point UPPER_REGION_ANCHOR_POINT = new Point(500 * X_SCALE_FACTOR,90 * Y_SCALE_FACTOR);//was 500, 105
+    static final Point LOWER_REGION_ANCHOR_POINT = new Point(500 * X_SCALE_FACTOR, 145 * Y_SCALE_FACTOR);
 
     static final int REGION_WIDTH = (int) (10 * X_SCALE_FACTOR);
     static final int UPPER_REGION_HEIGHT = (int) (25 * Y_SCALE_FACTOR);
@@ -127,8 +127,8 @@ public class StackVisionPipeline extends OpenCvPipeline {
         upper_region_H_average = (int) Core.mean(upper_region_H).val[0];
         lower_region_H_average = (int) Core.mean(lower_region_H).val[0];
 
-        upper_region_S_average = (int) Core.mean(upper_region_S).val[0];//not sure if the 0 is right
-        lower_region_S_average = (int) Core.mean(lower_region_S).val[0];//not sure on this either
+        upper_region_S_average = (int) Core.mean(upper_region_S).val[0];
+        lower_region_S_average = (int) Core.mean(lower_region_S).val[0];
 
         double hMinimum = 10;
         double hMaximum = 20;//this was 29

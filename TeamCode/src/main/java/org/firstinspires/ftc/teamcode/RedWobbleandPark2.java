@@ -374,12 +374,14 @@ public class RedWobbleandPark2 extends LinearOpMode {
                     return;
                 }
 
-                intakeAndRamp.setPower(0);
+
                 //1.9 closes the hand
                 wga.closeHand();
                 if(isStopRequested()){
                     return;
                 }
+
+                shooter.setSpinUpSpeed(0.63);
 
                 TimingUtilities.sleep(this,0.8, this::update, null);
                 if(isStopRequested()){
@@ -390,6 +392,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 if(isStopRequested()){
                     return;
                 }
+                intakeAndRamp.setPower(0);
                 //1.11 turns around to original head
                 f2.turnToHeading(Math.toRadians(0));
                 if(isStopRequested()){
@@ -400,6 +403,15 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 if(isStopRequested()){
                     return;
                 }
+
+                intakeAndRamp.setPower(-1);
+                TimingUtilities.sleep(this, 0.6, this::update, null);
+                intakeAndRamp.setPower(1);
+                if(isStopRequested()){
+                    return;
+                }
+
+                shooter.setPower(shooter.spinUpSpeed);
                 //1.13 lowers arm to place second wobble goal
                 wga.goToPlacingPosition();
                 if(isStopRequested()){
@@ -509,12 +521,35 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 //1.15 raises arm
                 wga.setArmPosition(WobbleGoalArm.RESET_ARM_AUTO);
 
+
                 TimingUtilities.sleep(this, 0.6, this::update, null);
                 if(isStopRequested()){
                     return;
                 }
 
-                f2.driveToPoint(new Vector2(0,300));
+                f2.driveToPoint(new Vector2(0,450));
+                if(isStopRequested()){
+                    return;
+                }
+                intakeAndRamp.setPower(0);
+
+                if(isStopRequested()){
+                    return;
+                }
+
+                shooter.launchRing();
+                if(isStopRequested()){
+                    return;
+                }
+
+                TimingUtilities.blockUntil(this, () -> shooter.getQueuedLaunches() == 0, this::update, null);
+
+                f2.driveToPoint(new Vector2(0,-200));
+                if(isStopRequested()){
+                    return;
+                }
+
+                shooter.spinDown();
                 if(isStopRequested()){
                     return;
                 }
@@ -527,7 +562,7 @@ public class RedWobbleandPark2 extends LinearOpMode {
                 if(isStopRequested()){
                     return;
                 }
-                TimingUtilities.sleep(this,0.6,this::update, null);
+                TimingUtilities.sleep(this,0.8,this::update, null);
                 if(isStopRequested()){
                     return;
                 }

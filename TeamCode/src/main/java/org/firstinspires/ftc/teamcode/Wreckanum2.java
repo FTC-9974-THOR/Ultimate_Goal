@@ -138,9 +138,7 @@ public class Wreckanum2 extends OpMode {
                 shooter.launchRing();
             }
         } else if (gamepad2.x){
-            //et.reset();
             shooter.setSpinUpSpeed(0.7);//this was 0.65
-            //shooter.flywheel.setVelocity(2006);
             shooter.spinUp();
         } else if (gamepad2.back){
             shooter.setSpinUpSpeed(0.68);
