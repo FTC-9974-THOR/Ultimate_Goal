@@ -11,10 +11,10 @@ public class Wreckanum extends OpMode{
     DcMotor rightFront, rightBack, leftFront, leftBack;
     @Override
     public void init() {
-        rightFront = hardwareMap.dcMotor.get("MD-frontRight");
-        rightBack = hardwareMap.dcMotor.get("MD-backRight");
-        leftFront = hardwareMap.dcMotor.get("MD-frontLeft");
-        leftBack = hardwareMap.dcMotor.get("MD-backLeft");
+        rightFront = hardwareMap.dcMotor.get("frontRight");
+        rightBack = hardwareMap.dcMotor.get("backRight");
+        leftFront = hardwareMap.dcMotor.get("frontLeft");
+        leftBack = hardwareMap.dcMotor.get("backLeft");
 
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.REVERSE);

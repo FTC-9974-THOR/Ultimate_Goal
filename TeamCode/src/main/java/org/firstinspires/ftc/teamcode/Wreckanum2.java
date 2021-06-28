@@ -18,6 +18,8 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 @TeleOp(name = "Wreckanum 2", group = "Teleops")
 public class Wreckanum2 extends OpMode {
 
+    //motor names in RampBoi configuration:
+
     //DcMotor backLeft, backRight, frontLeft, frontRight;
     MecanumDrive md;
 
@@ -26,6 +28,7 @@ public class Wreckanum2 extends OpMode {
     IntakeAndRamp intakeAndRamp;
     WobbleGoalArm wobbleGoalArm;
     Shooter shooter;
+    Blocker blocker;
     /*IMUNavSource imu;
     Fusion2 f2;*/
 
@@ -54,6 +57,7 @@ public class Wreckanum2 extends OpMode {
         intakeAndRamp = new IntakeAndRamp(hardwareMap);
         wobbleGoalArm = new WobbleGoalArm(hardwareMap);
         shooter = new Shooter(hardwareMap);
+        blocker = new Blocker(hardwareMap);
 
         /*backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
@@ -70,6 +74,8 @@ public class Wreckanum2 extends OpMode {
         frontRight.setMode(RUN_USING_ENCODER);*/
 
         wobbleGoalArm.goToRetractedPosition();
+
+        blocker.goToDownPosition();
     }
 
     @Override
@@ -138,7 +144,7 @@ public class Wreckanum2 extends OpMode {
                 shooter.launchRing();
             }
         } else if (gamepad2.x){
-            shooter.setSpinUpSpeed(0.7);//this was 0.65
+            shooter.setSpinUpSpeed(0.68);//this was 0.7
             shooter.spinUp();
         } else if (gamepad2.back){
             shooter.setSpinUpSpeed(0.68);
@@ -147,7 +153,7 @@ public class Wreckanum2 extends OpMode {
             shooter.spinDown();
             shooter.cancelLaunches();
         } else if (gamepad2.b){
-            shooter.setSpinUpSpeed(0.63);
+            shooter.setSpinUpSpeed(0.61);//this was 0.63
             shooter.spinUp();
         }
 
@@ -178,6 +184,12 @@ public class Wreckanum2 extends OpMode {
             wobbleGoalArm.openHand();
         } else if (gamepad2.left_bumper){
             wobbleGoalArm.closeHand();
+        }
+
+        if (gamepad1.a){
+            blocker.goToDownPosition();
+        } else if (gamepad1.b){
+            blocker.goToUpPosition();
         }
 
         shooter.update();
